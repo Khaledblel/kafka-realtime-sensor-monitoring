@@ -22,6 +22,35 @@ A complete end-to-end example of a real-time data streaming and visualization pi
 5. **REST API & Server (`server.js`)**: An Express application that serves the frontend dashboard and exposes endpoints (`/messages`) to fetch historical data.
 6. **Frontend Dashboard (`public/index.html`)**: A responsive UI built with Bootstrap and Chart.js that polls the API to display real-time line charts and data tables.
 
+```mermaid
+graph LR
+    subgraph "Data Ingestion"
+        P[Producer: Node.js] -- "1. Sends JSON Event" --> K
+    end
+
+    subgraph "Message Broker"
+        K{{"Kafka Broker <br/>(KRaft Mode)"}}
+        Topic[("Topic: test-topic")]
+        K --- Topic
+    end
+
+    subgraph "Processing & Storage"
+        K -- "2. Streams Data" --> C[Consumer: Node.js]
+        C -- "3. SQL Insert" --> DB[(PostgreSQL)]
+    end
+
+    subgraph "Serving Layer"
+        DB -- "4. SQL Query" --> API[REST API: Express]
+        API -- "5. JSON Data" --> Dash["Web Dashboard <br/>(Chart.js)"]
+    end
+
+    %% Styling
+    style P fill:#f9f,stroke:#333,stroke-width:2px
+    style K fill:#ff9,stroke:#f60,stroke-width:3px
+    style DB fill:#69f,stroke:#005,stroke-width:2px
+    style Dash fill:#9f9,stroke:#333,stroke-width:2px
+```
+
 ---
 
 ## 🚀 Prerequisites
