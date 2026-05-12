@@ -9,10 +9,7 @@ A complete end-to-end example of a real-time data streaming and visualization pi
 
 ## 📊 Dashboard Preview
 
-*(Add your actual screenshot image in your repository and update the path below)*
-
 ![Real-Time Dashboard](./public/screenshot.png)
-> **Note**: To add your screenshot, take a picture of your dashboard, save it as `screenshot.png` inside the `public` folder, and it will appear here.
 
 ---
 
@@ -41,29 +38,39 @@ To run this project, you will need:
 
 ### 1. Start PostgreSQL (via Docker)
 Run the following command to start a PostgreSQL database in the background:
+```bash
 docker run --name pg-kafka -e POSTGRES_PASSWORD=root -e POSTGRES_USER=postgres -e POSTGRES_DB=tp_kafka -p 5432:5432 -d postgres
+```
 
 ### 2. Setup and Start Apache Kafka (KRaft Mode)
 Download Kafka and extract it:
+```bash
 wget https://archive.apache.org/dist/kafka/4.2.0/kafka_2.13-4.2.0.tgz
 tar -xzf kafka_2.13-4.2.0.tgz
 cd kafka_2.13-4.2.0
+```
 
 Format the KRaft storage and start the server:
+```bash
 # Generate Cluster ID and format storage
 KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
 bin/kafka-storage.sh format --standalone -t "$KAFKA_CLUSTER_ID" -c config/server.properties
 
 # Start the Kafka Broker (Leave this terminal running)
 bin/kafka-server-start.sh config/server.properties
+```
 
 Create the topic:
 *Open a new terminal in the Kafka directory:*
+```bash
 bin/kafka-topics.sh --create --partitions 3 --replication-factor 1 --topic test-topic --bootstrap-server localhost:9092
+```
 
 ### 3. Setup the Node.js Application
 Navigate to the Node.js project directory (or create it), initialize the project, and install dependencies:
+```bash
 npm install kafkajs express pg dotenv
+```
 
 ---
 
@@ -83,6 +90,19 @@ node consumer.js
 Start the Express server to expose the REST API and serve the dashboard.
 node server.js
 
+### API Smoke Tests
+Once the server is running, you can verify the REST API with these curl commands:
+```bash
+# Fetch the latest 50 stored sensor readings
+curl http://localhost:3000/messages
+
+# Fetch a single reading by ID
+curl http://localhost:3000/messages/1
+
+# Pretty-print the JSON if `jq` is installed
+curl http://localhost:3000/messages | jq
+```
+
 ---
 
 ## 🌐 Visualization
@@ -95,6 +115,7 @@ You will see the real-time monitoring dashboard with the live temperature chart 
 
 ## 📂 Project Structure
 
+```text
 .
 ├── db.js                # PostgreSQL connection pool and table initialization
 ├── producer.js          # Kafka Producer (generates mock sensor data)
@@ -103,6 +124,7 @@ You will see the real-time monitoring dashboard with the live temperature chart 
 ├── package.json         # Node.js dependencies
 └── public/
     └── index.html       # Real-time Dashboard UI (Chart.js & Bootstrap)
+```
 
 ## 📝 License
 This project is open-source and available under the [MIT License](LICENSE). Feel free to use it as a boilerplate for your own Kafka streaming applications!
